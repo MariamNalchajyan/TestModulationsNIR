@@ -6,6 +6,7 @@
 #include "Drawer.h"
 #include "Generation.h"
 
+
 // Диалоговое окно CTestModulationsDlg
 class CTestModulationsDlg : public CDialogEx
 {
@@ -38,4 +39,8 @@ public:
 	vector<double>FN_t;
 	Drawer pic1,pic2;
 	afx_msg void OnBnClickedButton2();
+	CButton checkbox;
+	CButton cuda_checkbox;
+
+	double vfn_time;
 };

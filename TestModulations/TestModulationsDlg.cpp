@@ -7,7 +7,7 @@
 #include "TestModulations.h"
 #include "TestModulationsDlg.h"
 #include "afxdialogex.h"
-
+#include "Header.cuh"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -20,6 +20,7 @@
 
 CTestModulationsDlg::CTestModulationsDlg(CWnd* pParent /*=nullptr*/)
 	: CDialogEx(IDD_TESTMODULATIONS_DIALOG, pParent)
+	, vfn_time(0)
 {
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
 }
@@ -27,6 +28,10 @@ CTestModulationsDlg::CTestModulationsDlg(CWnd* pParent /*=nullptr*/)
 void CTestModulationsDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialogEx::DoDataExchange(pDX);
+	DDX_Control(pDX, IDC_CHECK1, checkbox);
+	DDX_Control(pDX, IDC_CHECK2, cuda_checkbox);
+
+	DDX_Text(pDX, IDC_EDIT1, vfn_time);
 }
 
 BEGIN_MESSAGE_MAP(CTestModulationsDlg, CDialogEx)
@@ -197,9 +202,19 @@ void CTestModulationsDlg::OnBnClickedButton1()
 
 
 	/////////////      ВФН   //////////////////////////////
-
-	//CalcVFN(sputnik1_signal, sputnik2_signal, VFN, sampling_frequency);
-	ModifVFN(sputnik1_signal, sputnik2_signal, VFN, sampling_frequency);
+	int start = clock();
+	if (checkbox.GetState() == BST_CHECKED)
+	{
+		if (cuda_checkbox.GetState() != BST_CHECKED)ModifVFN(sputnik1_signal, sputnik2_signal, VFN, sampling_frequency);
+		else
+		{
+			cudaModifVFN(sputnik1_signal, sputnik2_signal, VFN, sampling_frequency);
+		}
+	}
+	else CalcVFN(sputnik1_signal, sputnik2_signal, VFN, sampling_frequency);
+	int end = clock();
+	vfn_time = (double)(end - start) / CLOCKS_PER_SEC;
+	UpdateData(FALSE);
 	vector<double>maximums = GetMaxMin(VFN.signal);
 	int max_t_index = maximums[3];
 	int max_f_index = maximums[2];
@@ -210,12 +225,15 @@ void CTestModulationsDlg::OnBnClickedButton1()
 		FN_f[i] = abs(VFN.signal[max_f_index][i]);
 	}
 	FN_t = GetProjection(VFN, max_t_index);
-	pic1.Draw(L"t,с", L"Сечение №1 модиф. ВФН OFDM-сигналов", L"red", FN_t, MinElement(VFN.t_keys), MinElement(FN_t),MaxElement(VFN.t_keys), roundUp(MaxElement(FN_t),10), VFN.t_keys,true,max_f_index);
-	pic2.Draw(L"f,Гц", L"Сечение №2 модиф. ВФН OFDM-сигналов", L"red", FN_f, MinElement(VFN.f_keys), MinElement(FN_f), MaxElement(VFN.f_keys),roundUp( MaxElement(FN_f),10), VFN.f_keys,true,max_t_index);
+	pic1.Draw(L"t,с", L"Сечение №1 модиф. ВФН OFDM-сигналов", L"red", FN_t, MinElement(VFN.t_keys), MinElement(FN_t), MaxElement(VFN.t_keys), roundUp(MaxElement(FN_t), 10), VFN.t_keys, true, max_f_index);
+	pic2.Draw(L"f,Гц", L"Сечение №2 модиф. ВФН OFDM-сигналов", L"red", FN_f, MinElement(VFN.f_keys), MinElement(FN_f), MaxElement(VFN.f_keys), roundUp(MaxElement(FN_f), 10), VFN.f_keys, true, max_t_index);
 
 
 	//double f_shift = VFN.f_keys[MaxElementWithIndex(FN_f)[1]];
 	//double t_shift = VFN.t_keys[MaxElementWithIndex(FN_t)[1]];
+		
+
+	
 }
 
 #include <iostream>

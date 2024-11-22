@@ -7,7 +7,6 @@
 #include <algorithm>
 #include <numeric>
 
-
 using namespace std;
 
 static bool RandomBit(double low_chance)

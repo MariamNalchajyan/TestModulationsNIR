@@ -42,6 +42,9 @@
     <ClInclude Include="functions.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
+    <ClInclude Include="Header.cuh">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="TestModulations.cpp">
@@ -68,5 +71,10 @@
     <Image Include="res\TestModulations.ico">
       <Filter>Файлы ресурсов</Filter>
     </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <CudaCompile Include="Header.cu">
+      <Filter>Исходные файлы</Filter>
+    </CudaCompile>
   </ItemGroup>
 </Project>
