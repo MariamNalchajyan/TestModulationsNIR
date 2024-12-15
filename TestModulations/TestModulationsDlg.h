@@ -43,4 +43,5 @@ public:
 	CButton cuda_checkbox;
 
 	double vfn_time;
+	afx_msg void OnBnClickedButton3();
 };

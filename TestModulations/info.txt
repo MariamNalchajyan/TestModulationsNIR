@@ -1,0 +1,155 @@
+VFN
+sample_size = 4096
+vfn.f.size = 4096
+vfn.t.size = 8192
+time = 2.301
+
+
+CudaModifVFN
+sample_size = 4096
+vfn.f.size = 4096
+vfn.t.size = 8192
+time = 129.655
+
+
+
+CudaModifVFN
+sample_size = 2048
+vfn.f.size = 2048
+vfn.t.size = 4096
+time = 16.497
+
+
+CudaModifVFN
+sample_size = 8192
+vfn.f.size = 8192
+vfn.t.size = 16384
+time = 1062.42
+
+
+
+CudaModifVFN
+sample_size = 1024
+vfn.f.size = 1024
+vfn.t.size = 2048
+time = 2.234
+
+
+
+CudaModifVFN
+sample_size = 512
+vfn.f.size = 512
+vfn.t.size = 1024
+time = 0.446
+
+
+
+ModifVFN
+sample_size = 8192
+vfn.f.size = 8192
+vfn.t.size = 16384
+time = 35503
+
+
+
+ModifVFN
+sample_size = 2048
+vfn.f.size = 2048
+vfn.t.size = 4096
+time = 552.613
+
+
+
+CudaModifVFN
+sample_size = 1024
+vfn.f.size = 1024
+vfn.t.size = 2048
+time = 2.283
+
+
+
+CudaModifVFN
+sample_size = 1024
+vfn.f.size = 1024
+vfn.t.size = 2048
+time = 2.461
+
+
+
+CudaModifVFN
+sample_size = 2048
+vfn.f.size = 2048
+vfn.t.size = 4096
+time = 16.384
+
+
+
+CudaModifVFN
+sample_size = 4096
+vfn.f.size = 4096
+vfn.t.size = 8192
+time = 129.377
+
+
+
+CudaModifVFN
+sample_size = 8192
+vfn.f.size = 8192
+vfn.t.size = 16384
+time = 1037.63
+
+
+
+CudaModifVFN
+sample_size = 1024
+vfn.f.size = 1024
+vfn.t.size = 2048
+time = 2.259
+
+
+
+CudaModifVFN
+sample_size = 1024
+vfn.f.size = 1024
+vfn.t.size = 2048
+time = 2.284
+
+
+
+CudaModifVFN
+sample_size = 1024
+vfn.f.size = 1024
+vfn.t.size = 2048
+time = 2.249
+
+
+
+CudaModifVFN
+sample_size = 1024
+vfn.f.size = 1024
+vfn.t.size = 2048
+time = 2.274
+
+
+
+CudaModifVFN
+sample_size = 1024
+vfn.f.size = 1024
+vfn.t.size = 2048
+time = 2.295
+
+
+
+CudaModifVFN
+sample_size = 256
+vfn.f.size = 256
+vfn.t.size = 512
+time = 0.166
+
+
+
+CudaModifVFN
+sample_size = 256
+vfn.f.size = 256
+vfn.t.size = 512
+time = 0.182

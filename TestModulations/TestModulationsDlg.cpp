@@ -8,7 +8,8 @@
 #include "TestModulationsDlg.h"
 #include "afxdialogex.h"
 #include "Header.cuh"
-
+#include <iostream>
+#include <fstream>
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #endif
@@ -39,6 +40,7 @@ BEGIN_MESSAGE_MAP(CTestModulationsDlg, CDialogEx)
 	ON_WM_QUERYDRAGICON()
 	ON_BN_CLICKED(IDC_BUTTON1, &CTestModulationsDlg::OnBnClickedButton1)
 	ON_BN_CLICKED(IDC_BUTTON2, &CTestModulationsDlg::OnBnClickedButton2)
+	ON_BN_CLICKED(IDC_BUTTON3, &CTestModulationsDlg::OnBnClickedButton3)
 END_MESSAGE_MAP()
 
 
@@ -145,7 +147,8 @@ void CTestModulationsDlg::OnBnClickedButton1()
 	double freq_delay2 = 1600.e3;
 	double scale1 = 1. + abs(freq_delay1 / f0);
 	double scale2 = 1. + abs(freq_delay2 / f0);
-	int new_sample_size = M / 4;
+	int new_sample_size = M/4;
+
 
 
 	//vector<complex<double>>spectr = FFT(manip_signal.signal, -1);
@@ -163,7 +166,7 @@ void CTestModulationsDlg::OnBnClickedButton1()
 	transformSignal2(manip_signal, time_delay2, freq_delay2, new_sample_size, sampling_frequency, 10, sputnik2_signal,is_ofdm,scale2);
 	
 	
-	vector<complex<double>>spectr1 = FFT(sputnik1_signal.signal, -1);
+	/*vector<complex<double>>spectr1 = FFT(sputnik1_signal.signal, -1);
 	vector<double>ampl_sp1(spectr1.size());
 	vector<double>fr1;
 	for (int i = 0; i < spectr1.size(); i++)
@@ -182,7 +185,7 @@ void CTestModulationsDlg::OnBnClickedButton1()
 		ampl_sp2[i] = abs(spectr2[i]);
 		fr2.push_back((double)i * (sampling_frequency * scale2) / spectr1.size());
 	}
-	pic2.Draw(L"", L"", L"red", ampl_sp2, MinElement(fr2), MinElement(ampl_sp2), MaxElement(fr2), MaxElement(ampl_sp2), fr2);
+	pic2.Draw(L"", L"", L"red", ampl_sp2, MinElement(fr2), MinElement(ampl_sp2), MaxElement(fr2), MaxElement(ampl_sp2), fr2);*/
 
 	
 	///////////////////////////  Коррелляция   //////////////////////////////
@@ -200,20 +203,39 @@ void CTestModulationsDlg::OnBnClickedButton1()
 
 //	pic2.Draw(L"", L"", L"red", ampl_corr, MinElement(correlation.keys), MinElement(ampl_corr), MaxElement(correlation.keys), MaxElement(ampl_corr), correlation.keys);
 
-
+	std::ofstream out("info.txt", std::ios::app);
+	out << endl << endl << endl;
 	/////////////      ВФН   //////////////////////////////
-	int start = clock();
+	int start, end; 
 	if (checkbox.GetState() == BST_CHECKED)
 	{
-		if (cuda_checkbox.GetState() != BST_CHECKED)ModifVFN(sputnik1_signal, sputnik2_signal, VFN, sampling_frequency);
+		if (cuda_checkbox.GetState() != BST_CHECKED)
+		{
+			out << "ModifVFN" << endl;
+			start = clock();
+			ModifVFN(sputnik1_signal, sputnik2_signal, VFN, sampling_frequency);
+			end = clock();
+		}
 		else
 		{
+			out << "CudaModifVFN" << endl;
+			start = clock();
 			cudaModifVFN(sputnik1_signal, sputnik2_signal, VFN, sampling_frequency);
+			end = clock();
 		}
 	}
-	else CalcVFN(sputnik1_signal, sputnik2_signal, VFN, sampling_frequency);
-	int end = clock();
+	else
+	{
+		out << "VFN" << endl;
+		start = clock();
+		CalcVFN(sputnik1_signal, sputnik2_signal, VFN, sampling_frequency);
+		end = clock();
+	}
 	vfn_time = (double)(end - start) / CLOCKS_PER_SEC;
+	out << "sample_size = " << new_sample_size << endl;
+	out << "vfn.f.size = " << VFN.f_keys.size() << endl;
+	out << "vfn.t.size = " << VFN.t_keys.size() << endl;
+	out << "time = " << vfn_time << endl;
 	UpdateData(FALSE);
 	vector<double>maximums = GetMaxMin(VFN.signal);
 	int max_t_index = maximums[3];
@@ -236,8 +258,7 @@ void CTestModulationsDlg::OnBnClickedButton1()
 	
 }
 
-#include <iostream>
-#include <fstream>
+
 void CTestModulationsDlg::OnBnClickedButton2()
 {
 	//vector<double>source_signal;
@@ -358,4 +379,104 @@ void CTestModulationsDlg::OnBnClickedButton2()
 		MaxElement(noise), 23, noise, noise);
 	pic2.Draw_two(L"ОСШ,дБ", L"Критерий выраженности главного максимума ВКФ MSK-сигналов", corr_msk, corr2_msk, MinElement(noise), 4,
 		MaxElement(noise), 23, noise, noise);*/
+}
+
+void CTestModulationsDlg::OnBnClickedButton3()
+{
+	vector<double>time1, time2, accel, number;
+	number = { 512,1024,2048,4096,8192};
+	time1 = { 0.446  ,2.234 ,16.497 ,129.655 ,1062.42 };
+	time2 = { 9.2,69.874,552.613 ,4482.2 ,35503 };
+	for (int i = 0; i < time1.size(); i++)
+	{
+		accel.push_back(time2[i] / time1[i]);
+		number[i] *= (2 * number[i]/1.e6);
+		time1[i] /= 60;
+		time2[i] /= 60;
+	}
+	/*pic1.Draw_two(L"", L"Время расчета,минуты", time1, time2, 512, 0.446,
+		8192, 35503 / 60,number,number);*/
+
+	pic1.Draw(L"MN,10^6", L"Коэф ускорения", L"red", accel, MinElement(number), MinElement(accel), /*roundUp(*/MaxElement(number)/*, 10)*/, MaxElement(accel), number);
+	//pic1.Draw(L"MN,10^6", L"Время выполнения,мин", L"red", time1, MinElement(number), MinElement(time1), /*roundUp(*/MaxElement(number)/*, 10)*/, MaxElement(time1), number);
+	//pic2.Draw(L"MN,10^6", L"Время выполнения,мин", L"red", time2, MinElement(number), MinElement(time2), /*roundUp(*/MaxElement(number)/*, 10)*/, MaxElement(time2), number);
+
+	//VFN.signal.clear();
+	//VFN.f_keys.clear();
+	//VFN.t_keys.clear();
+	//FN_f.clear();
+	//FN_f.clear();
+
+	//vector<double>source_signal;
+	//vector<double>time_keys;
+	//vector<double>freq_keys;
+
+	//double f0 = 1600.e6;//несущая
+	//double Br = 60.e6;//скорость передачи данных
+	//double sampling_frequency = 500.e6;
+	//int N = 20;//кол-во поднесущих-
+	//double M = 8192;//кол-во отсчетов каждого сигнала
+	//double B = 200.e6;//ширина спектра
+
+
+	////Signal manip_signal = MSK(M, Br, sampling_frequency);
+	////Signal manip_signal = BPSK(M, Br, sampling_frequency);
+	//Signal manip_signal = OFDM(B, N, M, Br, sampling_frequency);
+	//bool is_ofdm = true;
+
+	//double time_delay1 = 1100. / sampling_frequency;
+	//double freq_delay1 = 1600.e4;
+	//double time_delay2 = 1000. / sampling_frequency;
+	//double freq_delay2 = 1600.e3;
+	//double scale1 = 1. + abs(freq_delay1 / f0);
+	//double scale2 = 1. + abs(freq_delay2 / f0);
+
+	//
+	//vector<double>accel_coef, axis_array_size;
+	//Signal sputnik1_signal, sputnik2_signal;
+	//vector<double>t1, t2;
+	//std::ofstream out("accelCoef.txt", std::ios::app);
+	//out << endl;
+	//for (int i = 16; i >= 16; i-=2)
+	//{
+	//	sputnik1_signal.keys.clear();
+	//	sputnik1_signal.signal.clear();
+	//	sputnik2_signal.keys.clear();
+	//	sputnik2_signal.signal.clear();
+	//	
+	//	int new_sample_size = M / 2;
+
+	//	transformSignal2(manip_signal, time_delay1, freq_delay1, new_sample_size, sampling_frequency, 10, sputnik1_signal, is_ofdm, scale1);
+	//	transformSignal2(manip_signal, time_delay2, freq_delay2, new_sample_size, sampling_frequency, 10, sputnik2_signal, is_ofdm, scale2);
+
+	//	VFN.f_keys.clear();
+	//	VFN.t_keys.clear();
+	//	VFN.signal.clear();
+
+	//	int start1, start2, end1, end2;
+	//	start1 = clock();
+	//	ModifVFN(sputnik1_signal, sputnik2_signal, VFN, sampling_frequency);
+	//	end1 = clock();
+	//	double time1 = (double)(end1 - start1) / CLOCKS_PER_SEC;
+	//	t1.push_back(time1);
+
+	//	VFN.f_keys.clear();
+	//	VFN.t_keys.clear();
+	//	VFN.signal.clear();
+
+	//	start2 = clock();
+	//	cudaModifVFN(sputnik1_signal, sputnik2_signal, VFN, sampling_frequency);
+	//	end2 = clock();
+	//	double time2 = (double)(end2 - start2) / CLOCKS_PER_SEC;
+	//	t2.push_back(time2);
+
+	//	accel_coef.push_back(time1 / time2);
+	//	out << VFN.f_keys.size()<<"  "<< VFN.t_keys.size() << "  " << time1<<"  "<<time2<<"  "<<time1 / time2 << endl;
+	//	axis_array_size.push_back(new_sample_size);
+	//	
+	//}
+	//out.close();
+	//pic1.Draw_two(L"", L"", t1, t2, MinElement(axis_array_size), MinElement(t2), MaxElement(axis_array_size), MaxElement(t1), axis_array_size, axis_array_size);
+	//pic2.Draw(L"N", L"Коэф ускорения", L"red", accel_coef, MinElement(axis_array_size), MinElement(accel_coef), MaxElement(axis_array_size), MaxElement(accel_coef), axis_array_size);
+
 }

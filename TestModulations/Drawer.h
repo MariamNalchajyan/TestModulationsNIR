@@ -42,7 +42,7 @@ public:
 		grid_pen.CreatePen(PS_DOT, 0.8, RGB(0, 0, 0));//характеристика пера сетки
 		data_pen.CreatePen(PS_SOLID, 1, RGB(/*0, 93, 108*/0, 0, 128));//характеристиа пера графика
 		data_pen1.CreatePen(PS_SOLID,1 ,RGB(0, 0, 255));//характеристиа пера графика
-		data_pen2.CreatePen(PS_SOLID, 1, RGB(255, 0, 0));//характеристиа пера графика восттановленного
+		data_pen2.CreatePen(PS_SOLID, 2, RGB(255, 0, 0));//характеристиа пера графика восттановленного
 		//шрифт
 		font.CreateFontW(18, 0, 0, 0,
 			FW_DONTCARE,
@@ -76,8 +76,8 @@ public:
 	{
 		if (!init) return;
 
-		int padding = 40;//расст. от краев рамки
-		int left_keys_padding = 25;//расст. для записи значений по вертикальной оси(слева)
+		int padding = 45;//расст. от краев рамки
+		int left_keys_padding = 28;//расст. для записи значений по вертикальной оси(слева)
 		int bottom_keys_padding = 25;// расст.для записи значений по горизонтальной оси(снизу)
 		int actual_width = frame.Width() - 2 * padding - left_keys_padding;//ширина графика
 		int actual_height = frame.Height() - 2 * padding - bottom_keys_padding;//высота графика
@@ -144,7 +144,7 @@ public:
 		for (unsigned int i = 0; i < y.size(); i++)
 		{
 			memDC.LineTo(x[i], y[i]);
-			//memDC.Ellipse(x[i] - 5, y[i] - 5, x[i] + 5, y[i] + 5);
+			memDC.Ellipse(x[i] - 5, y[i] - 5, x[i] + 5, y[i] + 5);
 		}
 
 		memDC.SelectObject(&font1);
@@ -162,8 +162,8 @@ public:
 		}
 		//подписываем значения по осям
 
-		memDC.TextOutW(actual_right-37, actual_bottom-20, axisX);
-		memDC.TextOutW(actual_left+5, actual_top-20, axisY);
+		memDC.TextOutW(actual_right-40, actual_bottom-20, axisX);
+		memDC.TextOutW(actual_left+5, actual_top-25, axisY);
 
 		memDC.SelectObject(&font);
 		memDC.SetTextColor(RGB(0, 0, 0));
@@ -173,10 +173,10 @@ public:
 			for (int i = 0; i < grid_size / 2 + 1; i++)
 			{
 				CString str;
-				str.Format(L"%.3e", data_x_min + i * (data_x_max - data_x_min) / (grid_size / 2));
+				str.Format(L"%.1f", data_x_min + i * (data_x_max - data_x_min) / (grid_size / 2));
 				memDC.TextOutW(actual_left + (double)i * actual_width / (grid_size / 2) , actual_bottom + bottom_keys_padding / 2., str);
 
-				str.Format(L"%.f", data_y_min + i * (data_y_max - data_y_min) / (grid_size / 2));
+				str.Format(L"%.3f", data_y_min + i * (data_y_max - data_y_min) / (grid_size / 2));
 				memDC.TextOutW(actual_left - 1.5 * left_keys_padding, actual_bottom - (double)i * actual_height / (grid_size / 2) - bottom_keys_padding/2, str);
 			}
 		}
@@ -290,10 +290,10 @@ public:
 			for (int i = 0; i < grid_size / 2 + 1; i++)
 			{
 				CString str;
-				str.Format(L"%.f", data_x_min + i * (data_x_max - data_x_min) / (grid_size / 2));
+				str.Format(L"%.1f", data_x_min + i * (data_x_max - data_x_min) / (grid_size / 2));
 				memDC.TextOutW(actual_left + (double)i * actual_width / (grid_size / 2), actual_bottom + bottom_keys_padding / 2., str);
 
-				str.Format(L"%.f", data_y_min + i * (data_y_max - data_y_min) / (grid_size / 2));
+				str.Format(L"%.2f", data_y_min + i * (data_y_max - data_y_min) / (grid_size / 2));
 				memDC.TextOutW(actual_left - 1.5 * left_keys_padding, actual_bottom - (double)i * actual_height / (grid_size / 2) - bottom_keys_padding / 2, str);
 			}
 		}
