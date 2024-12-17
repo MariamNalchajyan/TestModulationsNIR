@@ -394,13 +394,14 @@ void CTestModulationsDlg::OnBnClickedButton3()
 		time1[i] /= 60;
 		time2[i] /= 60;
 	}
-	/*pic1.Draw_two(L"", L"Время расчета,минуты", time1, time2, 512, 0.446,
-		8192, 35503 / 60,number,number);*/
+
 
 	pic1.Draw(L"MN,10^6", L"Коэф ускорения", L"red", accel, MinElement(number), MinElement(accel), /*roundUp(*/MaxElement(number)/*, 10)*/, MaxElement(accel), number);
 	//pic1.Draw(L"MN,10^6", L"Время выполнения,мин", L"red", time1, MinElement(number), MinElement(time1), /*roundUp(*/MaxElement(number)/*, 10)*/, MaxElement(time1), number);
 	//pic2.Draw(L"MN,10^6", L"Время выполнения,мин", L"red", time2, MinElement(number), MinElement(time2), /*roundUp(*/MaxElement(number)/*, 10)*/, MaxElement(time2), number);
 
+
+	///////////////////////////////////////////////
 	//VFN.signal.clear();
 	//VFN.f_keys.clear();
 	//VFN.t_keys.clear();
@@ -437,7 +438,7 @@ void CTestModulationsDlg::OnBnClickedButton3()
 	//vector<double>t1, t2;
 	//std::ofstream out("accelCoef.txt", std::ios::app);
 	//out << endl;
-	//for (int i = 16; i >= 16; i-=2)
+	//for (int i = 16; i >= 4; i-=2)
 	//{
 	//	sputnik1_signal.keys.clear();
 	//	sputnik1_signal.signal.clear();
