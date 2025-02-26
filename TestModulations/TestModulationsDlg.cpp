@@ -133,9 +133,9 @@ void CTestModulationsDlg::OnBnClickedButton1()
 	
 	
 	//Signal manip_signal = MSK(M, Br, sampling_frequency);
-	//Signal manip_signal = BPSK(M, Br, sampling_frequency);
-	Signal manip_signal = OFDM(B,N,M,Br,sampling_frequency);
-	bool is_ofdm = true;
+	Signal manip_signal = BPSK(M, Br, sampling_frequency);
+	//Signal manip_signal = OFDM(B,N,M,Br,sampling_frequency);
+	bool is_ofdm = false;
 
 	
 	//сигналы полученные спутниками 
@@ -213,7 +213,8 @@ void CTestModulationsDlg::OnBnClickedButton1()
 		{
 			out << "ModifVFN" << endl;
 			start = clock();
-			ModifVFN(sputnik1_signal, sputnik2_signal, VFN, sampling_frequency);
+			//ModifVFN(sputnik1_signal, sputnik2_signal, VFN, sampling_frequency);
+			ModifVFNwithFFT(sputnik1_signal, sputnik2_signal, VFN, sampling_frequency);
 			end = clock();
 		}
 		else
@@ -228,7 +229,8 @@ void CTestModulationsDlg::OnBnClickedButton1()
 	{
 		out << "VFN" << endl;
 		start = clock();
-		CalcVFN(sputnik1_signal, sputnik2_signal, VFN, sampling_frequency);
+		//CalcVFN(sputnik1_signal, sputnik2_signal, VFN, sampling_frequency);
+		CalcVFNwithFFT(sputnik1_signal, sputnik2_signal, VFN, sampling_frequency);
 		end = clock();
 	}
 	vfn_time = (double)(end - start) / CLOCKS_PER_SEC;
@@ -384,9 +386,9 @@ void CTestModulationsDlg::OnBnClickedButton2()
 void CTestModulationsDlg::OnBnClickedButton3()
 {
 	vector<double>time1, time2, accel, number;
-	number = { 512,1024,2048,4096,8192};
-	time1 = { 0.446  ,2.234 ,16.497 ,129.655 ,1062.42 };
-	time2 = { 9.2,69.874,552.613 ,4482.2 ,35503 };
+	number = { /*100,*/512,1024,2048,4096,7000,8192};
+	time1 = {/*0.004,*/ 0.446  ,2.234 ,16.497 ,129.655 ,659.697,1062.42 };
+	time2 = { /*0.067,*/9.2,69.874,552.613 ,4482.2 ,21863.221,35503 };
 	for (int i = 0; i < time1.size(); i++)
 	{
 		accel.push_back(time2[i] / time1[i]);
@@ -396,7 +398,7 @@ void CTestModulationsDlg::OnBnClickedButton3()
 	}
 
 
-	pic1.Draw(L"MN,10^6", L"Коэф ускорения", L"red", accel, MinElement(number), MinElement(accel), /*roundUp(*/MaxElement(number)/*, 10)*/, MaxElement(accel), number);
+	pic1.Draw(L"MN,10^6", L"Коэффициент ускорения", L"red", accel, MinElement(number), MinElement(accel), /*roundUp(*/MaxElement(number)/*, 10)*/, MaxElement(accel), number);
 	//pic1.Draw(L"MN,10^6", L"Время выполнения,мин", L"red", time1, MinElement(number), MinElement(time1), /*roundUp(*/MaxElement(number)/*, 10)*/, MaxElement(time1), number);
 	//pic2.Draw(L"MN,10^6", L"Время выполнения,мин", L"red", time2, MinElement(number), MinElement(time2), /*roundUp(*/MaxElement(number)/*, 10)*/, MaxElement(time2), number);
 

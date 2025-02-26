@@ -377,7 +377,96 @@ static void CalcVFN(Signal& signal1, Signal& signal2, Signal2D& outsignal,double
 
 	
  }
+static void CalcVFNwithFFT(Signal& signal1, Signal& signal2, Signal2D& outsignal, double sampling_frequency)
+{
+	//обычная ВФН, расчет с Фурье образами
 
+	outsignal.signal.resize(signal1.signal.size() + signal2.signal.size());
+	outsignal.f_keys.resize(signal1.signal.size());
+
+	for (int n = -(int)(signal2.signal.size()); n <= (int)(signal1.signal.size() - 1); n++)
+	{
+		outsignal.t_keys.push_back((double)n / sampling_frequency);
+	}
+
+	vector<complex<double>>s1 = signal1.signal;
+	s1.resize(signal1.signal.size() + signal2.signal.size());
+	vector<complex<double>>s2(signal1.signal.size() + signal2.signal.size()) ;
+	vector<complex<double>>fft1 = FFT(s1, -1), fft2, fft_mult(signal1.signal.size() + signal2.signal.size()),fft_obr;
+
+	for (int m = 0; m < signal2.signal.size(); m++)//цикл по сдвигам частот
+	{
+		outsignal.f_keys[m] = (m * sampling_frequency / (signal1.signal.size() - 1));
+		for (int i = 0; i < signal2.signal.size(); i++)//цикл по сигналу s2
+		{
+			s2[i] = signal2.signal[i]*exp(1.i * 2. * M_PI * (double)(m * i) / (double)signal2.signal.size());
+		}
+		fft2 = FFT(s2,-1);
+		for (int i = 0; i < signal1.signal.size() + signal2.signal.size(); i++)
+		{
+			fft_mult[i] = fft1[i] * fft2[i];
+		}
+
+		fft_obr=FFT(fft_mult,1);
+		for (int i = 0; i < signal1.signal.size() + signal2.signal.size(); i++)
+		{
+			outsignal.signal[i].push_back(fft_obr[i]);
+		}
+	}
+	cutFrequency(outsignal);
+}
+static void ModifVFNwithFFT(Signal& signal1, Signal& signal2, Signal2D& outsignal, double sampling_frequency)
+{
+	//модифицированная ВФН, расчет с Фурье образами
+
+	outsignal.signal.resize(signal1.signal.size() + signal2.signal.size());
+	outsignal.f_keys.resize(signal1.signal.size());
+	outsignal.t_keys.resize(signal1.signal.size() + signal2.signal.size());
+
+	int iter = 0;
+	for (int n = -(int)(signal2.signal.size()); n <= (int)(signal1.signal.size() - 1); n++)
+	{
+		outsignal.t_keys[iter] = ((double)n / sampling_frequency);
+		iter++;
+	}
+
+	vector<complex<double>>s1 = signal1.signal;
+	s1.resize(signal1.signal.size() + signal2.signal.size());
+	vector<complex<double>>s2(signal1.signal.size() + signal2.signal.size());
+	vector<complex<double>>fft1 = FFT(s1, -1), fft2, fft_mult(signal1.signal.size() + signal2.signal.size()), fft_obr;
+	for (int m = 0; m < signal2.signal.size(); m++)
+	{
+		outsignal.f_keys[m] = (m * sampling_frequency / (signal1.signal.size() - 1));
+		double k = 1. + m * sampling_frequency / (signal2.signal.size() - 1) / 1600.e6;//1600e6 - это f1
+
+		for (int i = 0; i < signal2.signal.size(); i++)
+		{
+			double index = (double)(i) / k;
+			int i1 = (int)index;
+			int i2 = i1 + 1;
+			if (i1 >= 0 && (i2 < signal2.signal.size()))
+				s2[i] = (LinInterpol(signal2.signal[i1], signal2.signal[i2], signal2.keys[i1], signal2.keys[i2], index / sampling_frequency))
+				* exp(1.i * 2. * M_PI * (k - 1) * 1600.e6 * (double)i / sampling_frequency);
+			else continue;
+			
+		}
+		fft2 = FFT(s2, -1);
+		for (int i = 0; i < signal1.signal.size() + signal2.signal.size(); i++)
+		{
+			fft_mult[i] = fft1[i] * fft2[i];
+		}
+
+		fft_obr = FFT(fft_mult, 1);
+		for (int i = 0; i < signal1.signal.size() + signal2.signal.size(); i++)
+		{
+			outsignal.signal[i].push_back(fft_obr[i]);
+		}
+	}
+
+	cutFrequency(outsignal);
+
+
+}
 static void ModifVFN(Signal& signal1, Signal& signal2, Signal2D& outsignal, double sampling_frequency)
 {
 	//модтфицированная ВФН(с масштабированием-интерполяцией), расчет в лоб
@@ -415,11 +504,7 @@ static void ModifVFN(Signal& signal1, Signal& signal2, Signal2D& outsignal, doub
 		outsignal.t_keys[iter] = ((double)n / sampling_frequency);
 		iter++;
 	}
-
-
 	cutFrequency(outsignal);
-
-
 }
 
 static vector<double>GetProjection(Signal2D& matrix, int index)
