@@ -133,15 +133,15 @@ void CTestModulationsDlg::OnBnClickedButton1()
 	
 	
 	//Signal manip_signal = MSK(M, Br, sampling_frequency);
-	Signal manip_signal = BPSK(M, Br, sampling_frequency);
-	//Signal manip_signal = OFDM(B,N,M,Br,sampling_frequency);
-	bool is_ofdm = false;
+	//Signal manip_signal = BPSK(M, Br, sampling_frequency);
+	Signal manip_signal = OFDM(B,N,M,Br,sampling_frequency);
+	bool is_ofdm = true;
 
 	
 	//сигналы полученные спутниками 
 	Signal sputnik1_signal, sputnik2_signal;
 	//сигналы полученные спутниками 
-	double time_delay1 = 1100. / sampling_frequency;
+	double time_delay1 = 2100. / sampling_frequency;
 	double freq_delay1 = 1600.e4;
 	double time_delay2 = 1000. / sampling_frequency;
 	double freq_delay2 = 1600.e3;
